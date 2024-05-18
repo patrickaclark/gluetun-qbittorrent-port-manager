@@ -9,6 +9,8 @@ ENV QBITTORRENT_USER=admin
 ENV QBITTORRENT_PASS=adminadmin
 ENV PORT_FORWARDED=tmp/gluetun/forwarded_port
 ENV HTTP_S=http
+ENV GLUETUN_SERVER=localhost
+ENV GLUETUN_CONTROL_PORT=8000
 
 COPY ./start.sh ./start.sh
 RUN chmod 770 ./start.sh
