@@ -1,13 +1,31 @@
-gluetun-qbittorrent-port-manager:
-  image: snoringdragon/gluetun-qbittorrent-port-manager:latest
-  restart: unless-stopped
-  volumes:
-    - /yourfolder:/tmp/gluetun #Set "yourfolder" to the same directory you used for Gluetun
-  network_mode: "service: gluetun"
-  environment:
-    QBITTORRENT_SERVER: localhost # IP Address of qbittorrent
-    QBITTORRENT_PORT: 8080
-    QBITTORRENT_USER: admin # username
-    QBITTORRENT_PASS: adminadmin # password
-    PORT_FORWARDED: /tmp/gluetun/forwarded_port
-    HTTP_S: http # Select 'http' or 'https' depending on if you use certificates.
+  gluetun-qbittorrent-port-manager:
+    image: <build locally, and upload to your own docker registry, add path here>
+    restart: unless-stopped
+    network_mode: service:gluetun
+    environment:
+      QBITTORRENT_SERVER: localhost # IP Address of qbittorrent
+      QBITTORRENT_PORT: 8080
+      QBITTORRENT_USER: admin # username
+      QBITTORRENT_PASS: adminadmin # password
+      HTTP_S: http # Select 'http' or 'https' depending on if you use certificates.
+      GLUETUN_HOST: localhost # IP or FQDN of gluetun control server
+      GLUETUN_PORT: 8000 # port of gluetun control server
+      RECHECK_TIME: 60 # number of seconds between checks to gluetun server for port
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        required: true
+        restart: true
+      qbittorrent:
+        condition: service_healthy
+        required: true
+        restart: true
+    healthcheck:
+      test: curl -sf https://www.google.com/ || exit 1
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      retries: 3
+      # Uncomment below if using deunhealth in your stack to restart unhealthy containers
+    #labels:
+    # - deunhealth.restart.on.unhealthy=true
